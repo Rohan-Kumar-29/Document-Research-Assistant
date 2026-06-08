@@ -119,6 +119,24 @@ streamlit run app.py
 
 ---
 
+## Deployment (Streamlit Community Cloud)
+
+1. Push this repo to GitHub (public).
+2. On [share.streamlit.io](https://share.streamlit.io), create a new app pointing at
+   `app.py` on the `main` branch.
+3. **In Advanced settings, set the Python version to 3.11.** This is required —
+   the RAGAS 0.2 / LangChain 0.3 stack does not build on Python 3.12+, and Cloud
+   defaults to a newer Python. The version can't be changed after deploy without
+   redeploying, so set it now. (A `runtime.txt` is currently unreliable on Cloud;
+   use the Advanced settings dialog.)
+4. In Advanced settings → Secrets, add your key in TOML form:
+   ```toml
+   GOOGLE_API_KEY = "your_key_here"
+   ```
+5. Deploy.
+
+---
+
 ## Project structure
 
 ```
