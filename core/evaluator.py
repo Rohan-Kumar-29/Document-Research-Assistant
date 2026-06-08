@@ -1,4 +1,3 @@
-import os
 from ragas import evaluate
 from ragas.metrics import faithfulness, answer_relevancy, context_precision
 from ragas.llms import LangchainLLMWrapper
@@ -6,6 +5,7 @@ from ragas.embeddings import LangchainEmbeddingsWrapper
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from datasets import Dataset
 
+from core.config import get_api_key
 from core.ingestor import EMBEDDING_MODEL, EMBEDDING_DIM
 
 
@@ -32,7 +32,7 @@ def score_response(
     """
     llm = ChatGoogleGenerativeAI(
         model=JUDGE_MODEL,
-        google_api_key=os.environ["GOOGLE_API_KEY"],
+        google_api_key=get_api_key(),
         temperature=0,
     )
     evaluator_llm = LangchainLLMWrapper(llm)
@@ -41,7 +41,7 @@ def score_response(
     # alone is not enough. Reuse the same Gemini embedding model as ingestion.
     embeddings = GoogleGenerativeAIEmbeddings(
         model=EMBEDDING_MODEL,
-        google_api_key=os.environ["GOOGLE_API_KEY"],
+        google_api_key=get_api_key(),
         output_dimensionality=EMBEDDING_DIM,
     )
     evaluator_embeddings = LangchainEmbeddingsWrapper(embeddings)

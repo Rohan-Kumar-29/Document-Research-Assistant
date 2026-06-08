@@ -1,8 +1,9 @@
-import os
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.output_parser import StrOutputParser
+
+from core.config import get_api_key
 
 
 # gemini-1.5-flash is retired (404). The 2.5 models are capped at only 20
@@ -64,7 +65,7 @@ def build_chain(retriever):
     """
     llm = ChatGoogleGenerativeAI(
         model=LLM_MODEL,
-        google_api_key=os.environ["GOOGLE_API_KEY"],
+        google_api_key=get_api_key(),
         temperature=0.1,       # Low temp = factual, less hallucination
         max_output_tokens=1024,
     )

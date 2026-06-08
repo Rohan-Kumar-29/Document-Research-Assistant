@@ -1,8 +1,9 @@
-import os
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
+
+from core.config import get_api_key
 
 
 # Current Gemini text embedding model. text-embedding-004 (used in older
@@ -16,7 +17,7 @@ def _get_embeddings() -> GoogleGenerativeAIEmbeddings:
     """Create the Gemini embeddings client used for both indexing and querying."""
     return GoogleGenerativeAIEmbeddings(
         model=EMBEDDING_MODEL,
-        google_api_key=os.environ["GOOGLE_API_KEY"],
+        google_api_key=get_api_key(),
         output_dimensionality=EMBEDDING_DIM,
     )
 
