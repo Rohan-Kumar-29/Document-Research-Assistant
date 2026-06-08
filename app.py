@@ -103,6 +103,15 @@ with st.sidebar:
     4. RAGAS scores the response live
     """)
 
+    st.divider()
+    run_eval = st.checkbox(
+        "Score answers with RAGAS",
+        value=False,
+        help="Adds faithfulness/relevance/precision scores, but uses several "
+        "extra API calls per question. Leave off to conserve free-tier quota; "
+        "turn on to demo the evaluation layer.",
+    )
+
 # ── Main area ─────────────────────────────────────────────────────────────────
 st.title("Ask your documents")
 
@@ -118,10 +127,11 @@ for item in st.session_state.history:
         st.write(item["query"])
     with st.chat_message("assistant"):
         st.write(item["answer"])
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Faithfulness", item["scores"]["faithfulness"])
-        col2.metric("Answer Relevance", item["scores"]["answer_relevancy"])
-        col3.metric("Context Precision", item["scores"]["context_precision"])
+        if item.get("scores"):
+            col1, col2, col3 = st.columns(3)
+            col1.metric("Faithfulness", item["scores"]["faithfulness"])
+            col2.metric("Answer Relevance", item["scores"]["answer_relevancy"])
+            col3.metric("Context Precision", item["scores"]["context_precision"])
 
 # Handle new query
 if query:
@@ -151,32 +161,37 @@ if query:
                 )
                 st.divider()
 
-        with st.spinner("Evaluating response quality..."):
-            contexts = [d.page_content for d in docs]
-            scores = score_response(query, answer, contexts)
-            label, explanation = interpret_score(scores["faithfulness"])
+        scores = None
+        if run_eval:
+            with st.spinner("Evaluating response quality..."):
+                contexts = [d.page_content for d in docs]
+                scores = score_response(query, answer, contexts)
+                label, explanation = interpret_score(scores["faithfulness"])
 
-        st.subheader("Response Quality (RAGAS)")
-        col1, col2, col3 = st.columns(3)
-        col1.metric(
-            "Faithfulness", scores["faithfulness"],
-            help="Is the answer supported by the context? Close to 1.0 = no hallucination.",
-        )
-        col2.metric(
-            "Answer Relevance", scores["answer_relevancy"],
-            help="Does the answer address the question?",
-        )
-        col3.metric(
-            "Context Precision", scores["context_precision"],
-            help="Are the retrieved chunks relevant to the question?",
-        )
+            st.subheader("Response Quality (RAGAS)")
+            col1, col2, col3 = st.columns(3)
+            col1.metric(
+                "Faithfulness", scores["faithfulness"],
+                help="Is the answer supported by the context? Close to 1.0 = no hallucination.",
+            )
+            col2.metric(
+                "Answer Relevance", scores["answer_relevancy"],
+                help="Does the answer address the question?",
+            )
+            col3.metric(
+                "Context Precision", scores["context_precision"],
+                help="Are the retrieved chunks relevant to the question?",
+            )
 
-        if scores["faithfulness"] >= 0.8:
-            st.success(f"**{label}** — {explanation}")
-        elif scores["faithfulness"] >= 0.5:
-            st.warning(f"**{label}** — {explanation}")
+            if scores["faithfulness"] >= 0.8:
+                st.success(f"**{label}** — {explanation}")
+            elif scores["faithfulness"] >= 0.5:
+                st.warning(f"**{label}** — {explanation}")
+            else:
+                st.error(f"**{label}** — {explanation}")
         else:
-            st.error(f"**{label}** — {explanation}")
+            st.caption("Enable **Score answers with RAGAS** in the sidebar to "
+                       "evaluate this response.")
 
         st.session_state.history.append({
             "query": query,

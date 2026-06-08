@@ -9,8 +9,9 @@ from datasets import Dataset
 from core.ingestor import EMBEDDING_MODEL, EMBEDDING_DIM
 
 
-# Same current model as the generator. gemini-1.5-flash is retired.
-JUDGE_MODEL = "gemini-2.5-flash"
+# Same current model as the generator. Flash-Lite keeps us within the free-tier
+# daily limits, which the full gemini-2.5-flash (20 requests/day) does not.
+JUDGE_MODEL = "gemini-2.5-flash-lite"
 
 
 def score_response(

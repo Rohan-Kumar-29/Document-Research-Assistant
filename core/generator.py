@@ -5,9 +5,11 @@ from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.output_parser import StrOutputParser
 
 
-# gemini-1.5-flash has been retired and returns 404. gemini-2.5-flash is the
-# current free-tier flash model and is verified available on this API key.
-LLM_MODEL = "gemini-2.5-flash"
+# gemini-1.5-flash has been retired and returns 404. We use gemini-2.5-flash-lite
+# because the full gemini-2.5-flash free tier is only 20 requests/day — far too
+# low for this app (~6 calls per question with evaluation on). Flash-Lite has a
+# much higher free-tier daily limit and is plenty capable for citation-grounded QA.
+LLM_MODEL = "gemini-2.5-flash-lite"
 
 
 SYSTEM_PROMPT = """You are a precise research assistant. Your job is to answer questions \
