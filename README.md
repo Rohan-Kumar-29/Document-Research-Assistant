@@ -3,8 +3,135 @@
 A hybrid RAG system that answers questions from multiple PDFs with inline citations
 and automatically evaluates every response using RAGAS metrics.
 
-> Work in progress — full documentation coming soon.
+**Live demo:** _add your Streamlit Cloud link here_
+
+---
+
+## What it does
+
+Upload multiple PDFs → ask questions → get cited answers → see live quality scores.
+
+The key differentiator: every response is scored for faithfulness, answer relevance,
+and context precision using RAGAS — so you don't just get an answer, you get a
+confidence signal telling you how much to trust it.
+
+---
+
+## Architecture
+
+**Pipeline:**
+1. PDF ingestion → `RecursiveCharacterTextSplitter` (chunk size 800, overlap 120)
+2. Embedding → Gemini `gemini-embedding-001` (768 dims) → stored in FAISS (local)
+3. Retrieval → Hybrid: BM25 (0.4) + FAISS (0.6) via `EnsembleRetriever` with RRF fusion
+4. Generation → Gemini 2.5 Flash with a citation-enforcing system prompt
+5. Evaluation → RAGAS: faithfulness, answer relevancy, context precision
+
+---
+
+## Design Decisions
+
+**Why chunk size 800 with 15% overlap?**
+Smaller chunks (300–400) improve retrieval precision but lose cross-sentence context.
+Larger chunks (1200+) dilute the embedding signal. 800 characters with 15% overlap
+preserves semantic coherence while keeping each chunk focused enough for accurate
+embedding.
+
+**Why BM25 weight 0.4 and FAISS weight 0.6?**
+Dense retrieval (FAISS) handles semantic queries better — "what does the author argue" —
+while BM25 handles exact-term queries better — model names, numbers, acronyms. The 40/60
+split favours FAISS because most user queries are semantic rather than keyword-based.
+
+**Why Gemini 2.5 Flash?**
+Cost efficiency: Flash is cheap per token with strong quality for citation-grounded QA,
+and the free tier covers all development needs. (The original 1.5 Flash model has since
+been retired by Google, so this project uses the current 2.5 Flash.)
+
+**Why faithfulness as the primary eval metric?**
+Faithfulness directly measures hallucination risk — whether the answer is supported by
+the retrieved context. For a document QA system, this is the most critical failure mode.
+Answer relevancy checks if we're answering the right question; context precision checks if
+we're retrieving the right chunks.
+
+**Known limitations:**
+- Does not support scanned PDFs (no OCR) — text-based PDFs only
+- FAISS index is rebuilt per session (no cross-session persistence on Streamlit Cloud)
+- RAGAS evaluation adds several seconds per response (LLM-as-judge)
+- The Gemini free tier is rate limited; heavy batch evaluation can hit quota limits
+
+**Future improvements:**
+- Cross-encoder reranking after hybrid retrieval
+- Multi-hop reasoning for complex questions
+- Session persistence for the FAISS index
+- Table and image extraction from PDFs
+
+---
 
 ## Stack
 
-Python · LangChain · FAISS · BM25 · Gemini · RAGAS · Streamlit
+| Layer | Tool |
+|---|---|
+| LLM | Gemini 2.5 Flash |
+| Embeddings | Gemini `gemini-embedding-001` |
+| Orchestration | LangChain 0.3 |
+| Vector store | FAISS (local) |
+| Keyword search | BM25 (rank-bm25) |
+| Evaluation | RAGAS 0.2 |
+| UI | Streamlit |
+| Deployment | Streamlit Community Cloud |
+
+---
+
+## Evaluation Results
+
+Run `tests/run_eval.py` against your own test documents and paste the measured
+averages here. (Numbers below are placeholders — replace them with real output.)
+
+| Metric | Score |
+|---|---|
+| Avg Faithfulness | X.XX |
+| Avg Answer Relevancy | X.XX |
+| Avg Context Precision | X.XX |
+
+---
+
+## Run locally
+
+```bash
+git clone https://github.com/Rohan-Kumar-29/Document-Research-Assistant
+cd Document-Research-Assistant
+python -m venv venv
+venv\Scripts\activate          # Windows
+# source venv/bin/activate     # macOS / Linux
+pip install -r requirements.txt
+```
+
+Create a `.env` file (see `.env.example`):
+
+```
+GOOGLE_API_KEY=your_key_here
+```
+
+Then run:
+
+```bash
+streamlit run app.py
+```
+
+---
+
+## Project structure
+
+```
+.
+├── app.py                 Streamlit UI (entry point)
+├── core/
+│   ├── ingestor.py        PDF loading, chunking, embedding, FAISS index
+│   ├── retriever.py       Hybrid BM25 + FAISS retriever
+│   ├── generator.py       LLM chain with citation prompt
+│   └── evaluator.py       RAGAS scoring
+├── tests/
+│   ├── eval_dataset.json  Q&A pairs for evaluation
+│   └── run_eval.py        Batch evaluation runner
+├── requirements.txt
+└── .env.example
+```
