@@ -1,0 +1,22 @@
+[
+  {
+    "question": "What is the main topic of the document?",
+    "ground_truth": "Replace with the correct, document-grounded answer.",
+    "document": "doc1.pdf"
+  },
+  {
+    "question": "What methodology or approach is described?",
+    "ground_truth": "Replace with the correct, document-grounded answer.",
+    "document": "doc1.pdf"
+  },
+  {
+    "question": "What are the key findings or conclusions?",
+    "ground_truth": "Replace with the correct, document-grounded answer.",
+    "document": "doc2.pdf"
+  },
+  {
+    "question": "Ask something the documents do NOT contain (negative test).",
+    "ground_truth": "The uploaded documents do not contain sufficient information to answer this question.",
+    "document": "doc1.pdf"
+  }
+]
