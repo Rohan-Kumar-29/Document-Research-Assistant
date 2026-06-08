@@ -5,11 +5,11 @@ from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.output_parser import StrOutputParser
 
 
-# gemini-1.5-flash has been retired and returns 404. We use gemini-2.5-flash-lite
-# because the full gemini-2.5-flash free tier is only 20 requests/day — far too
-# low for this app (~6 calls per question with evaluation on). Flash-Lite has a
-# much higher free-tier daily limit and is plenty capable for citation-grounded QA.
-LLM_MODEL = "gemini-2.5-flash-lite"
+# gemini-1.5-flash is retired (404). The 2.5 models are capped at only 20
+# requests/day on the free tier — unusable here, since one question costs several
+# calls when evaluation is on. gemini-2.0-flash keeps the generous free tier
+# (1,500 requests/day) and is strong for citation-grounded QA.
+LLM_MODEL = "gemini-2.0-flash"
 
 
 SYSTEM_PROMPT = """You are a precise research assistant. Your job is to answer questions \

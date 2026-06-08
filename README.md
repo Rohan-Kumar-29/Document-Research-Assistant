@@ -41,12 +41,13 @@ Dense retrieval (FAISS) handles semantic queries better — "what does the autho
 while BM25 handles exact-term queries better — model names, numbers, acronyms. The 40/60
 split favours FAISS because most user queries are semantic rather than keyword-based.
 
-**Why Gemini 2.5 Flash-Lite?**
-Cost efficiency: Flash-Lite is cheap, fast, and strong enough for citation-grounded QA
-(the model only has to read provided context and cite it). The original 1.5 Flash model
-has been retired, and the full 2.5 Flash free tier is only 20 requests/day — too low for
-this app, which makes ~6 calls per question when evaluation is on. Flash-Lite's higher
-free-tier limit keeps the demo usable without billing.
+**Why Gemini 2.0 Flash?**
+Cost efficiency and free-tier headroom: Flash is fast, cheap, and strong for
+citation-grounded QA (the model only has to read provided context and cite it). The 1.5
+models are retired, and the 2.5 models are capped at just 20 requests/day on the free
+tier — too low for this app, which makes ~6 calls per question when evaluation is on.
+Gemini 2.0 Flash keeps the generous 1,500 requests/day free tier, so the demo stays
+usable without billing.
 
 **Why faithfulness as the primary eval metric?**
 Faithfulness directly measures hallucination risk — whether the answer is supported by
@@ -72,7 +73,7 @@ we're retrieving the right chunks.
 
 | Layer | Tool |
 |---|---|
-| LLM | Gemini 2.5 Flash-Lite |
+| LLM | Gemini 2.0 Flash |
 | Embeddings | Gemini `gemini-embedding-001` |
 | Orchestration | LangChain 0.3 |
 | Vector store | FAISS (local) |
