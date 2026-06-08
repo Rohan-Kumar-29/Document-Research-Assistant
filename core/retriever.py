@@ -1,5 +1,5 @@
 from langchain_community.retrievers import BM25Retriever
-from langchain_classic.retrievers import EnsembleRetriever
+from langchain.retrievers import EnsembleRetriever
 from core.ingestor import load_faiss_index
 
 

@@ -1,8 +1,8 @@
 import os
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.prompts import PromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-from langchain_core.output_parsers import StrOutputParser
+from langchain.prompts import PromptTemplate
+from langchain.schema.runnable import RunnablePassthrough
+from langchain.schema.output_parser import StrOutputParser
 
 
 # gemini-1.5-flash has been retired and returns 404. gemini-2.5-flash is the
