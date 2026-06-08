@@ -1,0 +1,11 @@
+langchain>=0.3.0
+langchain-community>=0.3.0
+langchain-google-genai>=2.0.0
+google-generativeai>=0.8.0
+faiss-cpu>=1.8.0
+rank-bm25>=0.2.2
+ragas>=0.2.0
+datasets>=2.20.0
+streamlit>=1.38.0
+pypdf>=4.0.0
+python-dotenv>=1.0.0

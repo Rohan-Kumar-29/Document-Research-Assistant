@@ -1,0 +1,15 @@
+venv/
+.env
+data/faiss_index/
+sample_docs/*.pdf
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+*.egg-info/
+dist/
+build/
+.streamlit/secrets.toml
+
+# Internal build/interview-prep notes — keep local
+RAG_Project_Execution_Plan.md
